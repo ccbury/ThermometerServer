@@ -15,7 +15,7 @@ public class ThermometerServer {
     static double USDCny = 6.94;
 
     public static void main(String[] args) {
-        System.out.println("Opening port...\n");
+        System.out.println("Opening port...\n\n");
         try {
             dgramSocket = new DatagramSocket(PORT);//Step 1.
         } catch (SocketException e) {
@@ -39,14 +39,38 @@ public class ThermometerServer {
                 messageIn = new String(inPacket.getData(), 0, inPacket.getLength()); //Step 6.
                 StringTokenizer st = new StringTokenizer(messageIn);
 
-                System.out.println("Message received.");
+                System.out.println("Message received from client: ");
                 
+                Double temp = 0.0;
+                String unit = "";
+                Double tempConverted;
+                String unitConvertedTo;
                 String[] split = messageIn.split("\\s+");
-                double temp = Double.parseDouble(split[0]);
-                String unit = split[1];
                 
-                double tempConverted=0;
-                String unitConvertedTo="";
+                if (split.length == 2){
+                    try{
+                        temp = Double.parseDouble(split[0]);
+                        unit = split[1];
+                    } catch (Exception e){
+                        temp = 0.0;
+                        unit = "na";
+                    }
+                    System.out.println(temp+" "+unit);
+                 }else if (split.length == 1){
+                     split = messageIn.split("(?<=\\D)(?=\\d)([^\\d-]+)|(?<=\\d)(?=\\D)");
+                     if(split.length == 2){
+                    try{
+                        temp = Double.parseDouble(split[0]);
+                        unit = split[1];
+                    } catch (Exception e){
+                        temp = 0.0;
+                        unit = "na";
+                    }
+                        System.out.println(temp+" "+unit);
+                     }
+              
+                 }
+
                 
                 switch (unit){
                     case "C":
@@ -54,20 +78,24 @@ public class ThermometerServer {
                         tempConverted = (temp * 1.8) + 32;
                         unitConvertedTo = "F";
                         messageOut = (temp+" "+unit+" converts to "+tempConverted+" "+unitConvertedTo );
+                        System.out.println("Converts to "+tempConverted+" "+unitConvertedTo);
                         break;
                     case "F":
                     case "f":
-                        tempConverted = (temp - 32) * (5/9);
+                        tempConverted = (temp-32) * 5/9;
                         unitConvertedTo = "C";
                         messageOut = (temp+" "+unit+" converts to "+tempConverted+" "+unitConvertedTo );
+                        System.out.println("Converts to "+tempConverted+" "+unitConvertedTo);
                         break;
                     default:
+                        System.out.println("Valid format was not received.");
                         messageOut = ("A valid temperature format was not found in user input....");
                         break;
                 }
                 
                 outPacket = new DatagramPacket(messageOut.getBytes(), messageOut.length(), clientAddress, clientPort); //Step 7.
                 dgramSocket.send(outPacket);  
+                System.out.println("Responce sent to client.\n");
 
             } while (true);
         } catch (IOException e) {
