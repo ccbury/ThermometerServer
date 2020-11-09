@@ -70,18 +70,18 @@ public class ThermometerServer {
                      }
               
                  }
-
+                unit = unit.toLowerCase();
                 
                 switch (unit){
-                    case "C":
                     case "c":
+                    case "celsius":
                         tempConverted = (temp * 1.8) + 32;
                         unitConvertedTo = "F";
                         messageOut = (temp+" "+unit+" converts to "+tempConverted+" "+unitConvertedTo );
                         System.out.println("Converts to "+tempConverted+" "+unitConvertedTo);
                         break;
-                    case "F":
                     case "f":
+                    case "fahrenheit":
                         tempConverted = (temp-32) * 5/9;
                         unitConvertedTo = "C";
                         messageOut = (temp+" "+unit+" converts to "+tempConverted+" "+unitConvertedTo );
